@@ -23,7 +23,9 @@ public class Character : MonoBehaviour
     [Space(10)]
     public float projectileForce = 10.0f;
     public Rigidbody projectilePrefab;
-    public Transform projectileSpawnPoint;
+    public Transform projectileSpawnPointLeft;
+    public Transform projectileSpawnPointRight;
+
 
 
     void Start()
@@ -46,36 +48,61 @@ public class Character : MonoBehaviour
 
     void Update()
     {
-        float horizontal = Input.GetAxis("Horizontal");
-        float vertical = Input.GetAxis("Vertical");
-
-        if (controller.isGrounded)
+        try
         {
-            moveDir = new Vector3(horizontal, 0.0f, vertical);
-            moveDir *= speed;
+            float horizontal = Input.GetAxis("Horizontal");
+            float vertical = Input.GetAxis("Vertical");
 
-            moveDir = transform.TransformDirection(moveDir);
-
-            if (Input.GetButtonDown("Jump"))
+            if (controller.isGrounded)
             {
-                moveDir.y = jumpSpeed;
+                moveDir = new Vector3(horizontal, 0.0f, vertical);
+                moveDir *= speed;
+
+                moveDir = transform.TransformDirection(moveDir);
+
+                if (Input.GetButtonDown("Jump"))
+                {
+                    moveDir.y = jumpSpeed;
+                }
+
+            }
+            moveDir.y -= gravity * Time.deltaTime;
+            controller.Move(moveDir * Time.deltaTime);
+
+            if (Input.GetButtonDown("Fire1"))
+            {
+                FireLeft();
+                throw new UnassignedReferenceException("Fire1 not assigned " + name + " revert back to default " + Input.GetButtonDown("Fire1"));
             }
 
+            if (Input.GetButtonDown("Fire2"))
+                FireRight();
         }
-        moveDir.y -= gravity * Time.deltaTime;
-        controller.Move(moveDir * Time.deltaTime);
-
-        if (Input.GetButtonDown("Fire1"))
-            Fire();
+        finally
+        {
+            Debug.Log("You may shoot. pew pew");
+        }
     }
 
-    void Fire()
+    void FireLeft()
     {
-        if(projectilePrefab && projectileSpawnPoint)
+        if(projectilePrefab && projectileSpawnPointLeft)
         {
-            Rigidbody temp = Instantiate(projectilePrefab, projectileSpawnPoint.position, projectileSpawnPoint.rotation);
+            Rigidbody temp = Instantiate(projectilePrefab, projectileSpawnPointLeft.position, projectileSpawnPointLeft.rotation);
 
-            temp.AddForce(projectileSpawnPoint.forward * projectileForce, ForceMode.Impulse);
+            temp.AddForce(projectileSpawnPointLeft.forward * projectileForce, ForceMode.Impulse);
+
+            Destroy(temp.gameObject, 2.0f);
+        }
+    }
+
+    void FireRight()
+    {
+        if (projectilePrefab && projectileSpawnPointRight)
+        {
+            Rigidbody temp = Instantiate(projectilePrefab, projectileSpawnPointRight.position, projectileSpawnPointRight.rotation);
+
+            temp.AddForce(projectileSpawnPointRight.forward * projectileForce, ForceMode.Impulse);
 
             Destroy(temp.gameObject, 2.0f);
         }
@@ -83,6 +110,9 @@ public class Character : MonoBehaviour
 
     private void OnControllerColliderHit(ControllerColliderHit hit)
     {
-        
+        if (hit.gameObject.tag == "Collectible")
+        {
+            Destroy(hit.gameObject);
+        }
     }
 }
