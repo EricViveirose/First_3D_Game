@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using UnityEngine.SceneManagement;
 
 [RequireComponent(typeof(CharacterController))]
 public class Character : MonoBehaviour
@@ -13,7 +14,7 @@ public class Character : MonoBehaviour
     [Space(10)]
     [Tooltip("Speed value between 1 and 10")]
     [Range(1.0f, 10.0f)]
-    public float speed = 10;
+    public float speed = 10f;
     public float gravity = 9.81f;
     public float jumpSpeed = 10.0f;
 
@@ -108,11 +109,29 @@ public class Character : MonoBehaviour
         }
     }
 
-    private void OnControllerColliderHit(ControllerColliderHit hit)
+    private void OnTriggerEnter(Collider collision)
     {
-        if (hit.gameObject.tag == "Collectible")
+        if (collision.gameObject.tag == "Collectible")
         {
-            Destroy(hit.gameObject);
+            Destroy(collision.gameObject);
+        }
+
+        if (collision.gameObject.tag == "Enemy")
+        {
+            SceneManager.LoadScene("SampleScene");
         }
     }
+
+    //private void OnControllerColliderHit(ControllerColliderHit hit)
+    //{
+    //    if (hit.gameObject.tag == "Collectible")
+    //    {
+    //        Destroy(hit.gameObject);
+    //    }
+
+    //    if (hit.gameObject.tag == "Enemy")
+    //    {
+    //        Destroy(gameObject);
+    //    }
+    //}
 }

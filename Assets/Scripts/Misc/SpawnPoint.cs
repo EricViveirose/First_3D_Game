@@ -18,6 +18,7 @@ public class SpawnPoint : MonoBehaviour
         }
 
         finally
+
         {
             Debug.Log("Keys are in place. You may proceed");
         }

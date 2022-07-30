@@ -180,6 +180,7 @@ GameObject:
   - component: {fileID: 8646318197569181771}
   - component: {fileID: 8646318197569181770}
   - component: {fileID: 8646318197569181769}
+  - component: {fileID: -5356341849744964187}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -290,7 +291,8 @@ MonoBehaviour:
   jumpSpeed: 10
   projectileForce: 50
   projectilePrefab: {fileID: 2842392363932140513, guid: b9090b6887293f0439f50228d259d297, type: 3}
-  projectileSpawnPoint: {fileID: 8646318197282294273}
+  projectileSpawnPointLeft: {fileID: 0}
+  projectileSpawnPointRight: {fileID: 0}
 --- !u!114 &8646318197569181769
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -310,6 +312,20 @@ MonoBehaviour:
   maximumX: 360
   minimumY: -60
   maximumY: 60
+--- !u!136 &-5356341849744964187
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8646318197569181745}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  m_Radius: 0.5
+  m_Height: 2
+  m_Direction: 1
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &8646318198957490186
 GameObject:
   m_ObjectHideFlags: 0
