@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using UnityEngine.SceneManagement;
+using UnityEngine.InputSystem;
 
-[RequireComponent(typeof(CharacterController))]
+[RequireComponent(typeof(CharacterController), typeof(Animator))]
 public class Character : MonoBehaviour
 {
 
     CharacterController controller;
+    Animator anim;
 
     [Header("Player Settings")]
     [Space(10)]
@@ -24,14 +26,15 @@ public class Character : MonoBehaviour
     [Space(10)]
     public float projectileForce = 10.0f;
     public Rigidbody projectilePrefab;
-    public Transform projectileSpawnPointLeft;
-    public Transform projectileSpawnPointRight;
+    public Transform projectileSpawnPoint;
+    //public Transform projectileSpawnPointRight;
 
 
 
     void Start()
     {
         controller = GetComponent<CharacterController>();
+        anim = GetComponent<Animator>();
 
         controller.minMoveDistance = 0.0f;
 
@@ -70,14 +73,17 @@ public class Character : MonoBehaviour
             moveDir.y -= gravity * Time.deltaTime;
             controller.Move(moveDir * Time.deltaTime);
 
+            anim.SetFloat("Horizontal", horizontal);
+            anim.SetFloat("Vertical", vertical);
+
             if (Input.GetButtonDown("Fire1"))
             {
                 FireLeft();
                 throw new UnassignedReferenceException("Fire1 not assigned " + name + " revert back to default " + Input.GetButtonDown("Fire1"));
             }
 
-            if (Input.GetButtonDown("Fire2"))
-                FireRight();
+            //if (Input.GetButtonDown("Fire2"))
+            //    FireRight();
         }
         finally
         {
@@ -87,27 +93,27 @@ public class Character : MonoBehaviour
 
     void FireLeft()
     {
-        if(projectilePrefab && projectileSpawnPointLeft)
+        if(projectilePrefab && projectileSpawnPoint)
         {
-            Rigidbody temp = Instantiate(projectilePrefab, projectileSpawnPointLeft.position, projectileSpawnPointLeft.rotation);
+            Rigidbody temp = Instantiate(projectilePrefab, projectileSpawnPoint.position, projectileSpawnPoint.rotation);
 
-            temp.AddForce(projectileSpawnPointLeft.forward * projectileForce, ForceMode.Impulse);
+            temp.AddForce(projectileSpawnPoint.forward * projectileForce, ForceMode.Impulse);
 
             Destroy(temp.gameObject, 2.0f);
         }
     }
 
-    void FireRight()
-    {
-        if (projectilePrefab && projectileSpawnPointRight)
-        {
-            Rigidbody temp = Instantiate(projectilePrefab, projectileSpawnPointRight.position, projectileSpawnPointRight.rotation);
+    //void FireRight()
+    //{
+    //    if (projectilePrefab && projectileSpawnPointRight)
+    //    {
+    //        Rigidbody temp = Instantiate(projectilePrefab, projectileSpawnPointRight.position, projectileSpawnPointRight.rotation);
 
-            temp.AddForce(projectileSpawnPointRight.forward * projectileForce, ForceMode.Impulse);
+    //        temp.AddForce(projectileSpawnPointRight.forward * projectileForce, ForceMode.Impulse);
 
-            Destroy(temp.gameObject, 2.0f);
-        }
-    }
+    //        Destroy(temp.gameObject, 2.0f);
+    //    }
+    //}
 
     private void OnTriggerEnter(Collider collision)
     {
