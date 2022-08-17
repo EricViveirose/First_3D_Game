@@ -122,14 +122,24 @@ public class Character : MonoBehaviour
             Destroy(hit.gameObject);
         }
 
-        if (hit.gameObject.tag == "Enemy")
-        {
-            SceneManager.LoadScene("GameOver");
-        }
-
         if (hit.gameObject.tag == "Liquid")
         {
             SceneManager.LoadScene("GameOver");
         }
     }
+    //public void GameOver()
+    //{
+    //    SceneManager.LoadScene("GameOver");
+    //}
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.tag == "Enemy")
+        {
+            Destroy(gameObject);
+            SceneManager.LoadScene("GameOver");
+            //Invoke("GameOver", 1f);
+        }
+    }   
+
 }
