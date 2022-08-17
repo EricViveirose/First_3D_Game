@@ -3,20 +3,18 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using UnityEngine.SceneManagement;
-using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(CharacterController), typeof(Animator))]
 public class Character : MonoBehaviour
 {
-
     CharacterController controller;
     Animator anim;
 
     [Header("Player Settings")]
     [Space(10)]
-    [Tooltip("Speed value between 1 and 10")]
-    [Range(1.0f, 10.0f)]
-    public float speed = 10f;
+    [Tooltip("Speed value between 1 and 20")]
+    [Range(1.0f, 20.0f)]
+    public float speed = 20;
     public float gravity = 9.81f;
     public float jumpSpeed = 10.0f;
 
@@ -27,10 +25,9 @@ public class Character : MonoBehaviour
     public float projectileForce = 10.0f;
     public Rigidbody projectilePrefab;
     public Transform projectileSpawnPoint;
-    //public Transform projectileSpawnPointRight;
 
 
-
+    // Start is called before the first frame update
     void Start()
     {
         controller = GetComponent<CharacterController>();
@@ -40,24 +37,27 @@ public class Character : MonoBehaviour
 
         if (speed <= 0.0f)
         {
-            speed = 10.0f;
+            speed = 20.0f;
+
         }
 
-        if (jumpSpeed <= 0.0f)
+        if (jumpSpeed <= 0)
         {
             jumpSpeed = 10.0f;
         }
     }
 
-
+    // Update is called once per frame
     void Update()
     {
+        float horizontal = Input.GetAxis("Horizontal");
+        float vertical = Input.GetAxis("Vertical");
+
         try
         {
-            float horizontal = Input.GetAxis("Horizontal");
-            float vertical = Input.GetAxis("Vertical");
 
             if (controller.isGrounded)
+
             {
                 moveDir = new Vector3(horizontal, 0.0f, vertical);
                 moveDir *= speed;
@@ -67,77 +67,69 @@ public class Character : MonoBehaviour
                 if (Input.GetButtonDown("Jump"))
                 {
                     moveDir.y = jumpSpeed;
+                    anim.SetTrigger("Jump");
                 }
 
+                if (Input.GetKeyDown(KeyCode.Q))
+                {
+                    anim.SetTrigger("Punch");
+                }
+                if (Input.GetKeyDown(KeyCode.E))
+                {
+                    anim.SetTrigger("Kick");
+                }
+                if (Input.GetButtonDown("Fire1"))
+                {
+                    anim.SetTrigger("Shoot");
+                }
             }
+
             moveDir.y -= gravity * Time.deltaTime;
             controller.Move(moveDir * Time.deltaTime);
 
-            anim.SetFloat("Horizontal", horizontal);
-            anim.SetFloat("Vertical", vertical);
+            anim.SetFloat("horizontal", horizontal);
+            anim.SetFloat("vertical", vertical);
 
             if (Input.GetButtonDown("Fire1"))
-            {
-                FireLeft();
-                throw new UnassignedReferenceException("Fire1 not assigned " + name + " revert back to default " + Input.GetButtonDown("Fire1"));
-            }
-
-            //if (Input.GetButtonDown("Fire2"))
-            //    FireRight();
+                Fire1();
+            throw new UnassignedReferenceException("Shooting Disabled " + name + " Shooting Enabled " + Input.GetButtonDown("Fire1"));
         }
         finally
         {
-            Debug.Log("You may shoot. pew pew");
+            Debug.Log("Shooting has been Enabled");
         }
     }
 
-    void FireLeft()
+    void Fire1()
     {
-        if(projectilePrefab && projectileSpawnPoint)
+        anim.SetTrigger("Shoot");
+        if (projectilePrefab && projectileSpawnPoint)
         {
             Rigidbody temp = Instantiate(projectilePrefab, projectileSpawnPoint.position, projectileSpawnPoint.rotation);
 
             temp.AddForce(projectileSpawnPoint.forward * projectileForce, ForceMode.Impulse);
 
-            Destroy(temp.gameObject, 2.0f);
+            Destroy(temp.gameObject, 5.0f);
         }
     }
 
-    //void FireRight()
-    //{
-    //    if (projectilePrefab && projectileSpawnPointRight)
-    //    {
-    //        Rigidbody temp = Instantiate(projectilePrefab, projectileSpawnPointRight.position, projectileSpawnPointRight.rotation);
 
-    //        temp.AddForce(projectileSpawnPointRight.forward * projectileForce, ForceMode.Impulse);
 
-    //        Destroy(temp.gameObject, 2.0f);
-    //    }
-    //}
-
-    private void OnTriggerEnter(Collider collision)
+    private void OnControllerColliderHit(ControllerColliderHit hit)
     {
-        if (collision.gameObject.tag == "Collectible")
+        if (hit.gameObject.tag == "Collectible")
         {
-            Destroy(collision.gameObject);
+            Destroy(hit.gameObject);
         }
 
-        if (collision.gameObject.tag == "Enemy")
+        if (hit.gameObject.tag == "Enemy")
         {
-            SceneManager.LoadScene("SampleScene");
+            SceneManager.LoadScene("GameOver");
+        }
+
+        if (hit.gameObject.tag == "Liquid")
+        {
+            SceneManager.LoadScene("GameOver");
         }
     }
-
-    //private void OnControllerColliderHit(ControllerColliderHit hit)
-    //{
-    //    if (hit.gameObject.tag == "Collectible")
-    //    {
-    //        Destroy(hit.gameObject);
-    //    }
-
-    //    if (hit.gameObject.tag == "Enemy")
-    //    {
-    //        Destroy(gameObject);
-    //    }
-    //}
 }

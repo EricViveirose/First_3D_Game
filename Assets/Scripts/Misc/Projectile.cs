@@ -1,16 +1,22 @@
-
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class Projectile : MonoBehaviour
 {
+    public Animator anim;
+    public Animator eAnim;
+
     private void OnTriggerEnter(Collider other)
     {
+
         if (other.gameObject.CompareTag("Enemy"))
         {
-            Destroy(other.gameObject);         // this destroys the enemy
-            Destroy(gameObject);              // this destroys the bullet
+            eAnim.SetTrigger("Death");
+            Destroy(other.gameObject, 2f);
+
         }
     }
+
 }
+
